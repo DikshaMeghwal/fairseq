@@ -1,0 +1,3 @@
+['remote "myremote"']
+url = gs://dmeghwal-dataset-bert
+credentialpath = /home/dm4511/MyFirstProject-5e77bdf78187.json

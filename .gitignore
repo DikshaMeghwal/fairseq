@@ -130,3 +130,4 @@ gpt2_bpe/
 wikitext-103-raw/
 roberta.base.tar.gz
 roberta.base/
+/data
