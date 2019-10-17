@@ -124,10 +124,19 @@ data-bin/
 /fairseq/data/data_utils_fast.cpp
 /fairseq/data/token_block_utils_fast.cpp
 
+# model folders
+roberta.base.tar.gz
+roberta.base/
+roberta.large*
+
+# data folders
 data/
 Wikitext-03/
 gpt2_bpe/
 wikitext-103-raw/
-roberta.base.tar.gz
-roberta.base/
-/data
+RTE-bin
+slurm*
+glue_data/
+
+# job run logs
+slurm*

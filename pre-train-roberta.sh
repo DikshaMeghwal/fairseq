@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=4
 #SBATCH --gres=gpu:2 -c2
-#SBATCH --mem=30GB
+#SBATCH --mem=50GB
 #SBATCH --time=12:00:00
 #SBATCH --mail-type=END
 #SBATCH --mail-user=dm4511@nyu.edu
@@ -13,11 +13,10 @@ WARMUP_UPDATES=10000    # Warmup the learning rate over this many updates
 PEAK_LR=0.0005          # Peak learning rate, adjust as needed
 TOKENS_PER_SAMPLE=512   # Max sequence length
 MAX_POSITIONS=512       # Num. positional embeddings (usually same as above)
-MAX_SENTENCES=16        # Number of sequences per batch (batch size)
-UPDATE_FREQ=16          # Increase the batch size 16x
+MAX_SENTENCES=8        # Number of sequences per batch (batch size)
+UPDATE_FREQ=32          # Increase the batch size 16x
 
-DATA_DIR=../data/news-commentary-v14.en
-
+DATA_DIR=./data/news_commentary
 fairseq-train --fp16 $DATA_DIR \
     --task masked_lm --criterion masked_lm \
     --arch roberta_base --sample-break-mode complete --tokens-per-sample $TOKENS_PER_SAMPLE \
