@@ -5,7 +5,7 @@
 
 import torch
 import torch.nn.functional as F
-
+from fairseq.utils import new_arange
 from fairseq.models import register_model, register_model_architecture
 from fairseq.models.model_utils import fill_tensors as _fill, skip_tensors as _skip
 from fairseq.models.transformer import (
@@ -156,7 +156,7 @@ def _apply_ins_masks(
     out_lengths = in_lengths + mask_ins_pred.sum(1)
     out_max_len = out_lengths.max()
     out_masks = (
-        torch.arange(out_max_len, device=out_lengths.device)[None, :]
+        new_arange(out_lengths, out_max_len)[None, :]
         < out_lengths[:, None]
     )
 
@@ -205,9 +205,7 @@ def _apply_del_words(
     word_del_pred.masked_fill_(bos_eos_masks, 0)
 
     reordering = (
-        torch.arange(max_len, device=in_tokens.device)[None, :]
-        .expand_as(in_tokens)
-        .contiguous()
+        new_arange(in_tokens)
         .masked_fill_(word_del_pred, max_len)
         .sort(1)[1]
     )
@@ -323,12 +321,16 @@ class LevenshteinTransformerModel(TransformerModel):
         output_scores = decoder_out["output_scores"]
         attn = decoder_out["attn"]
 
+        bsz = output_tokens.size(0)
         if max_ratio is None:
-            max_lens = output_tokens.new(output_tokens.size(0)).fill_(255)
+            max_lens = output_tokens.new().fill_(255)
         else:
-            max_lens = (
-                (~encoder_out["encoder_padding_mask"]).sum(1) * max_ratio
-            ).clamp(min=10)
+            if encoder_out["encoder_padding_mask"] is None:
+                max_src_len = encoder_out["encoder_out"].size(1)
+                src_lens = encoder_out["encoder_out"].new(bsz).fill_(max_src_len)
+            else:
+                src_lens = (~encoder_out["encoder_padding_mask"]).sum(1)
+            max_lens = (src_lens * max_ratio).clamp(min=10).long()
 
         # delete words
         # do not delete tokens if it is <s> </s>
@@ -364,7 +366,7 @@ class LevenshteinTransformerModel(TransformerModel):
                 mask_ins_score[:, :, 0] -= eos_penalty
             mask_ins_pred = mask_ins_score.max(-1)[1]
             mask_ins_pred = torch.min(
-                mask_ins_pred, max_lens[:, None].expand_as(mask_ins_pred)
+                mask_ins_pred, max_lens[can_ins_mask, None].expand_as(mask_ins_pred)
             )
 
             _tokens, _scores = _apply_ins_masks(
