@@ -128,6 +128,8 @@ data-bin/
 roberta.base.tar.gz
 roberta.base/
 roberta.large*
+checkpoints
+fine-checkpoints
 
 # data folders
 data/

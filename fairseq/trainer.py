@@ -239,7 +239,6 @@ class Trainer(object):
                 self.args.train_subset,
                 epoch=epoch,
                 combine=combine,
-                data_selector=data_selector,
             )
         return self.task.get_batch_iterator(
             dataset=self.task.dataset(self.args.train_subset),

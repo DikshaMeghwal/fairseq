@@ -1,10 +1,10 @@
 #!/bin/bash
 #SBATCH --job-name=pre-BERT
 #SBATCH --nodes=1
-#SBATCH --cpus-per-task=4
-#SBATCH --gres=gpu:2 -c2
+##SBATCH --cpus-per-task=4
+#SBATCH --gres=gpu:2
 #SBATCH --mem=50GB
-#SBATCH --time=12:00:00
+#SBATCH --time=168:00:00
 #SBATCH --mail-type=END
 #SBATCH --mail-user=dm4511@nyu.edu
 

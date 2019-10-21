@@ -2,17 +2,18 @@
 #SBATCH --job-name=fine-BERT
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=4
-#SBATCH --gres=gpu:v100:1
+#SBATCH --gres=gpu:p40:2 -c2
 #SBATCH --mem=50GB
 #SBATCH --time=12:00:00
 #SBATCH --mail-type=END
 #SBATCH --mail-user=dm4511@nyu.edu
 
-TOTAL_NUM_UPDATES=3000  # 10 epochs through RTE for bsz 16
-WARMUP_UPDATES=180      # 6 percent of the number of updates
+TOTAL_NUM_UPDATES=2036  # 10 epochs through RTE for bsz 16
+WARMUP_UPDATES=122      # 6 percent of the number of updates
 LR=2e-05                # Peak LR for polynomial LR scheduler.
 NUM_CLASSES=2
 MAX_SENTENCES=8        # Batch size.
+UPDATE_FREQ=4
 ROBERTA_PATH=./roberta.large/model.pt
 
 CUDA_VISIBLE_DEVICES=0 python train.py RTE-bin/ \
