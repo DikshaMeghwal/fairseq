@@ -1,0 +1,1 @@
+../data/dbpedia/Wikipedia-cat-1.txt

@@ -142,3 +142,10 @@ glue_data/
 
 # job run logs
 slurm*
+QQP
+MNLI
+RTE
+checkpoints
+roberta_base_e62.pt
+superglue_data/
+*.pt

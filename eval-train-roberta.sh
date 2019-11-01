@@ -18,7 +18,7 @@ DATA_DIR=$1
 SAVE_DIR=$2
 SAVE_INTERVAL=$3
 
-python train.py --fp16 $DATA_DIR \
+fairseq-eval-lm --fp16 $DATA_DIR \
     --task masked_lm --criterion masked_lm \
     --arch roberta_base --sample-break-mode complete --tokens-per-sample $TOKENS_PER_SAMPLE \
     --optimizer adam --adam-betas '(0.9,0.98)' --adam-eps 1e-6 --clip-norm 0.0 \

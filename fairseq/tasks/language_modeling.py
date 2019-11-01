@@ -134,17 +134,17 @@ class LanguageModelingTask(FairseqTask):
             targets.append("past")
         if len(targets) == 0:
             # standard language modeling
-            targets = ["future"]
+            targets = ["self"]
 
         return cls(args, dictionary, output_dictionary, targets=targets)
 
     def build_model(self, args):
         model = super().build_model(args)
-
+        print(f"model supported targets: {model.supported_targets}")
         for target in self.targets:
             if target not in model.supported_targets:
                 raise ValueError(
-                    "Unsupported language modeling target: {}".format(target)
+                    "Unsupported language modeling target: " + target
                 )
 
         return model
