@@ -181,7 +181,7 @@ class Trainer(object):
 
             # load model parameters
             try:
-                self.get_model().load_state_dict(state['model'], strict=True)
+                self.get_model().load_state_dict(state['model'], strict=True, args=self.args)
                 if utils.has_parameters(self.get_criterion()):
                     self.get_criterion().load_state_dict(state['criterion'], strict=True)
             except Exception:
@@ -329,7 +329,7 @@ class Trainer(object):
                     print(msg, file=sys.stderr)
                     if torch.cuda.is_available() and hasattr(torch.cuda, "memory_summary"):
                         for device_idx in range(torch.cuda.device_count()):
-                            print(torch.cuda.memory_summary(device=torch.cuda.device(device_idx)),
+                            print(torch.cuda.memory_summary(device=device_idx),
                                   file=sys.stderr)
                     sys.stderr.flush()
 
