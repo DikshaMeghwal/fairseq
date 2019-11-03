@@ -149,3 +149,5 @@ checkpoints
 roberta_base_e62.pt
 superglue_data/
 *.pt
+
+._*
