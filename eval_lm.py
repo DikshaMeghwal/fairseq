@@ -65,7 +65,7 @@ def main(parsed_args):
     for arg in vars(parsed_args).keys():
         if arg not in {
             'self_target', 'future_target', 'past_target', 'tokens_per_sample',
-            'output_size_dictionary', 'add_bos_token',
+            'output_size_dictionary',
         }:
             setattr(args, arg, getattr(parsed_args, arg))
 
@@ -74,6 +74,7 @@ def main(parsed_args):
     task = tasks.setup_task(args)
 
     # Load dataset splits
+    # import pdb; pdb.set_trace()
     task.load_dataset(args.gen_subset)
     dataset = task.dataset(args.gen_subset)
     if args.context_window > 0:
@@ -94,7 +95,7 @@ def main(parsed_args):
             model.cuda()
 
     assert len(models) > 0
-
+    print(models)
     print('num. model params: {}'.format(sum(p.numel() for p in models[0].parameters())))
 
     itr = task.get_batch_iterator(
@@ -143,7 +144,13 @@ def main(parsed_args):
             sample = utils.move_to_cuda(sample) if use_cuda else sample
 
             gen_timer.start()
-            hypos = scorer.generate(models, sample)
+            hypos = None
+            try:
+                hypos = scorer.generate(models, sample)
+            except:
+                print("Oops caught that damn error again")
+                break
+
             gen_timer.stop(sample['ntokens'])
 
             for i, hypos_i in enumerate(hypos):
@@ -207,6 +214,7 @@ def main(parsed_args):
 
             wps_meter.update(sample['ntokens'])
             t.log({'wps': round(wps_meter.avg)})
+            # break
 
     avg_nll_loss = -score_sum / count
     print('| Evaluated {} tokens in {:.1f}s ({:.2f} tokens/s)'.format(gen_timer.n, gen_timer.sum, 1. / gen_timer.avg))

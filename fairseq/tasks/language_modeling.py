@@ -83,6 +83,10 @@ class LanguageModelingTask(FairseqTask):
 
     def __init__(self, args, dictionary, output_dictionary=None, targets=None):
         super().__init__(args)
+        ## hack for making eval work
+        # add mask token
+        self.mask_idx = dictionary.add_symbol('<mask>')
+
         self.dictionary = dictionary
         self.output_dictionary = output_dictionary or dictionary
 
