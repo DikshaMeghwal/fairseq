@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=pre-BERT
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:2 -c2
+#SBATCH --gres=gpu:1
 #SBATCH --mem=50GB
 #SBATCH --time=168:00:00
 #SBATCH --mail-type=END
@@ -17,6 +17,7 @@ UPDATE_FREQ=64          # Increase the batch size 16x
 DATA_DIR=$1
 SAVE_DIR=$2
 SAVE_INTERVAL=$3
+CHECKPOINT=$4
 
 python train.py --fp16 $DATA_DIR \
     --task masked_lm --criterion masked_lm \
@@ -25,4 +26,5 @@ python train.py --fp16 $DATA_DIR \
     --lr-scheduler polynomial_decay --lr $PEAK_LR --warmup-updates $WARMUP_UPDATES --total-num-update $TOTAL_UPDATES \
     --dropout 0.1 --attention-dropout 0.1 --weight-decay 0.01 \
     --max-sentences $MAX_SENTENCES --update-freq $UPDATE_FREQ \
-    --max-update $TOTAL_UPDATES --log-format simple --log-interval 1
+    --max-update $TOTAL_UPDATES --log-format simple --log-interval 1 \
+    --skip-invalid-size-inputs-valid-test --restore-file $CHECKPOINT --valid-subset test --train-subset test

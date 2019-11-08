@@ -13,6 +13,7 @@ import random
 
 import numpy as np
 import torch
+from tqdm import tqdm
 
 from fairseq import checkpoint_utils, distributed_utils, options, progress_bar, tasks, utils
 from fairseq.data import iterators
@@ -51,13 +52,13 @@ def main(args, init_distributed=False):
     # Print args
     print(args)
 
-    import pdb; pdb.set_trace()
     # Setup task, e.g., translation, language modeling, etc.
     task = tasks.setup_task(args)
 
     # Load valid dataset (we load training data below, based on the latest checkpoint)
     for valid_sub_split in args.valid_subset.split(','):
         task.load_dataset(valid_sub_split, combine=False, epoch=0)
+    # import pdb; pdb.set_trace()
 
     # Build model and criterion
     model = task.build_model(args)
@@ -88,32 +89,34 @@ def main(args, init_distributed=False):
     train_meter = StopwatchMeter()
     train_meter.start()
     valid_subsets = args.valid_subset.split(',')
-    while lr > args.min_lr and epoch_itr.epoch < max_epoch and trainer.get_num_updates() < max_update:
+    # while lr > args.min_lr and epoch_itr.epoch < max_epoch and trainer.get_num_updates() < max_update:
         # train for one epoch
-        train(args, trainer, task, epoch_itr)
+        # train(args, trainer, task, epoch_itr)
 
-        if not args.disable_validation and epoch_itr.epoch % args.validate_interval == 0:
-            valid_losses = validate(args, trainer, task, epoch_itr, valid_subsets)
-        else:
-            valid_losses = [None]
+        # if not args.disable_validation and epoch_itr.epoch % args.validate_interval == 0:
+    valid_losses = validate(args, trainer, task, epoch_itr, valid_subsets)
+        # else:
+        #     valid_losses = [None]
 
-        # only use first validation loss to update the learning rate
-        lr = trainer.lr_step(epoch_itr.epoch, valid_losses[0])
+        # # only use first validation loss to update the learning rate
+        # lr = trainer.lr_step(epoch_itr.epoch, valid_losses[0])
 
-        # save checkpoint
-        if epoch_itr.epoch % args.save_interval == 0:
-            checkpoint_utils.save_checkpoint(args, trainer, epoch_itr, valid_losses[0])
+        # # save checkpoint
+        # if epoch_itr.epoch % args.save_interval == 0:
+        #     checkpoint_utils.save_checkpoint(args, trainer, epoch_itr, valid_losses[0])
 
-        reload_dataset = ':' in getattr(args, 'data', '')
-        # sharded data: get train iterator for next epoch
-        epoch_itr = trainer.get_train_iterator(epoch_itr.epoch, load_dataset=reload_dataset)
+        # reload_dataset = ':' in getattr(args, 'data', '')
+        # # sharded data: get train iterator for next epoch
+        # epoch_itr = trainer.get_train_iterator(epoch_itr.epoch, load_dataset=reload_dataset)
     train_meter.stop()
     print('| done training in {:.1f} seconds'.format(train_meter.sum))
+    print(valid_losses)
 
 
 def train(args, trainer, task, epoch_itr):
     """Train the model for one epoch."""
     # Update parameters every N batches
+    import pdb; pdb.set_trace()
     update_freq = args.update_freq[epoch_itr.epoch - 1] \
         if epoch_itr.epoch <= len(args.update_freq) else args.update_freq[-1]
 
@@ -243,7 +246,7 @@ def validate(args, trainer, task, epoch_itr, subsets):
                 meter.reset()
         extra_meters = collections.defaultdict(lambda: AverageMeter())
 
-        for sample in progress:
+        for sample in tqdm(progress):
             log_output = trainer.valid_step(sample)
 
             for k, v in log_output.items():

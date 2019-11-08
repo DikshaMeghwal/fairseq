@@ -124,7 +124,7 @@ def load_checkpoint(args, trainer, data_selector=None):
     if extra_state is not None and not args.reset_dataloader:
         # restore iterator from checkpoint
         itr_state = extra_state['train_iterator']
-        epoch_itr = trainer.get_train_iterator(epoch=itr_state['epoch'], load_dataset=True)
+        epoch_itr = trainer.get_train_iterator(epoch=itr_state['epoch'], load_dataset=False)
         epoch_itr.load_state_dict(itr_state)
     else:
         epoch_itr = trainer.get_train_iterator(epoch=0, load_dataset=True)
