@@ -156,3 +156,5 @@ language_modeling/*
 # VSCODE
 .vscode/ftp-sync.json
 .vscode/settings.json
+
+*.out
