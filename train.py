@@ -113,7 +113,8 @@ def train(args, trainer, task, epoch_itr):
     # Initialize data iterator
     itr = epoch_itr.next_epoch_itr(
         fix_batches_to_gpus=args.fix_batches_to_gpus,
-        shuffle=(epoch_itr.epoch >= args.curriculum),
+        # shuffle=(epoch_itr.epoch >= args.curriculum),
+        shuffle = False
     )
     itr = iterators.GroupedIterator(itr, update_freq)
     progress = progress_bar.build_progress_bar(
@@ -155,7 +156,7 @@ def train(args, trainer, task, epoch_itr):
             valid_losses = validate(args, trainer, task, epoch_itr, valid_subsets)
             checkpoint_utils.save_checkpoint(args, trainer, epoch_itr, valid_losses[0])
 
-        if num_updates >= max_update:
+        if num_updates >= max_update or ((i+1) * args.max_sentences > 10000):
             break
 
     # log end-of-epoch stats
