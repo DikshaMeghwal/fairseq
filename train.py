@@ -156,7 +156,7 @@ def train(args, trainer, task, epoch_itr):
             valid_losses = validate(args, trainer, task, epoch_itr, valid_subsets)
             checkpoint_utils.save_checkpoint(args, trainer, epoch_itr, valid_losses[0])
 
-        if num_updates >= max_update or ((i+1) * args.max_sentences > 10000):
+        if num_updates >= max_update:
             break
 
     # log end-of-epoch stats
